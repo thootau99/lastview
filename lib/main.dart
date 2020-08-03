@@ -35,7 +35,11 @@ class _MyHomePageState extends State<MyHomePage> {
     String result = '';
     final response = await http.get(SERVER + "get_face");
     if (response.statusCode == 200) {
-      result = json.decode(response.body);
+      try {
+        result = json.decode(response.body);
+      } catch (e) {
+        print(e);
+      }
     }
     var listOfResult = result.split("_");
     facenameList.clear();
@@ -59,15 +63,19 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             new Flexible(
               child: new ListView.builder(
+                  scrollDirection: Axis.vertical,
                   itemCount: facenameList.length,
                   itemBuilder: (_, index) => facenameList[index]),
             ),
-            FlatButton(
-              onPressed: () {
-                var url = SERVER + "new_data?ins=takeoff";
-                http.get(url);
-              },
-              child: Text("TAKEOFF"),
+            new Flexible(
+              flex: 1,
+              child: FlatButton(
+                onPressed: () {
+                  var url = SERVER + "new_data?ins=takeoff";
+                  http.get(url);
+                },
+                child: Text("TAKEOFF"),
+              ),
             ),
             FlatButton(
               onPressed: () {
@@ -89,6 +97,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 http.get(url);
               },
               child: Text("START"),
+            ),
+            FlatButton(
+              onPressed: () {
+                String setname = SERVER + "mask";
+                http.get(setname);
+              },
+              child: Text("MASK"),
+            ),
+            FlatButton(
+              onPressed: () {
+                String setname = SERVER + "normal";
+                http.get(setname);
+              },
+              child: Text("NORMAL"),
             ),
             FlatButton(
               onPressed: _fetchData,
