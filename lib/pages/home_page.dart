@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-var d = ["rr", "bb", "cc", "aa", "666"];
+var d = ["發現不明人物", "發現人物沒有戴口罩", "發現不明人物", "發現人物沒有戴口罩"];
 
 class HomePage extends StatelessWidget {
   @override
@@ -42,7 +42,7 @@ class NotificationContainer extends StatefulWidget {
 }
 
 class _NotificationContainer extends State<NotificationContainer> {
-  List<NotificationEntity> noti = [NotificationEntity("13")];
+  List<NotificationEntity> noti = [];
   aaaa() {
     setState(() {});
     for (var i in d) {
@@ -81,7 +81,7 @@ class _NotificationContainer extends State<NotificationContainer> {
 }
 
 class NotificationEntity extends StatelessWidget {
-  String name = '123';
+  String name = '';
   NotificationEntity(String s) {
     this.name = s;
   }
@@ -94,12 +94,13 @@ class NotificationEntity extends StatelessWidget {
             child: Padding(
                 padding: EdgeInsets.only(top: 32, left: 16, bottom: 32),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(this.name),
                     Image(
                       image: NetworkImage(
                           'https://pbs.twimg.com/profile_images/504715443479670784/fauyuPDy_400x400.png'),
-                      height: 100,
+                      height: 50,
                     )
                   ],
                 ))),

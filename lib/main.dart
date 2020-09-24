@@ -29,7 +29,7 @@ class BottomNavigationController extends StatefulWidget {
 }
 
 class _BottomNavigationController extends State<BottomNavigationController> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
   final pages = [HomePage(), ActionPage()];
 
   @override
