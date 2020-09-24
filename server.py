@@ -97,7 +97,7 @@ def new_noti():
     nm.notiAdd(NOTIFICATION_OFFICAL)
 
 @app.route('/show_noti')
-def show_noti:
+def show_noti():
     return nm.notiPrint()
 
 app.run(host="0.0.0.0")
