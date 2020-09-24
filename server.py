@@ -4,7 +4,9 @@ from flask import render_template
 from flask import jsonify
 
 import os
+import notificationManager as nm
 app = Flask(__name__)
+
 
 distance = 0
 waitingInstruction = {'instruction': '0', 'executed': '0'}
@@ -83,5 +85,19 @@ def see_data():
 def land():
     os.system("echo land success?")
     return "0"
+
+@app.route('/new_noti')
+def new_noti():
+    typeOfNoti = request.args.get('type')
+    timeOfNoti = request.args.get('time')
+    contentOfNoti = request.args.get('content')
+    imageURLOfNoti = request.args.get('imageURL')
+    NOTIFICATION_OFFICAL = {'type': typeOfNoti, 'time': timeOfNoti, 'content': contentOfNoti, 'imageURL': imageURLOfNoti}
+
+    nm.notiAdd(NOTIFICATION_OFFICAL)
+
+@app.route('/show_noti')
+def show_noti:
+    return nm.notiPrint()
 
 app.run(host="0.0.0.0")
