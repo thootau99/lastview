@@ -12,7 +12,7 @@ facename = []
 followname = ''
 @app.route('/')
 def hello_world():
-    return render_template("index.html")
+    return "test"
 @app.route('/stopwork')
 def stopwork():
     global waitingInstruction
@@ -83,3 +83,5 @@ def see_data():
 def land():
     os.system("echo land success?")
     return "0"
+
+app.run(host="0.0.0.0")
