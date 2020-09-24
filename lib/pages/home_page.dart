@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+final String SERVER = 'http://35.201.162.120:5000';
 
 var d = ["發現不明人物", "發現人物沒有戴口罩", "發現不明人物", "發現人物沒有戴口罩"];
 
@@ -43,17 +47,34 @@ class NotificationContainer extends StatefulWidget {
 
 class _NotificationContainer extends State<NotificationContainer> {
   List<NotificationEntity> noti = [];
-  aaaa() {
+  _fetchData() async {
     setState(() {});
-    for (var i in d) {
-      addDynamic(i);
+    Map result = {};
+    print(SERVER + "/show_noti");
+    final response = await http.get(SERVER + "/show_noti");
+    if (response.statusCode == 200) {
+      try {
+        result = jsonDecode(response.body);
+      } catch (e) {
+        print(e);
+      }
     }
-    print(noti);
+    for (var item in result['notification']) {
+      if (item['imageURL'] == '') {
+        item['imageURL'] =
+            "https://storage.googleapis.com/superb-binder-287603.appspot.com/test/ar00.png";
+      }
+      if (item['imageURL'][0] == '"') {
+        item['imageURL'] =
+            item['imageURL'].substring(1, item['imageURL'].length - 1);
+      }
+      addDynamic(item['type'], item['time'], item['content'], item['imageURL']);
+    }
   }
 
   @override
   void initState() {
-    this.aaaa();
+    this._fetchData();
   }
 
   @override
@@ -62,6 +83,7 @@ class _NotificationContainer extends State<NotificationContainer> {
     return Container(
       width: _screenSize.width,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Expanded(
               child: ListView.builder(
@@ -74,32 +96,38 @@ class _NotificationContainer extends State<NotificationContainer> {
     );
   }
 
-  addDynamic(String name) {
-    noti.add(new NotificationEntity(name));
+  addDynamic(String type, String time, String content, String imgURL) {
+    noti.add(new NotificationEntity(type, time, content, imgURL));
     setState(() {});
   }
 }
 
 class NotificationEntity extends StatelessWidget {
-  String name = '';
-  NotificationEntity(String s) {
-    this.name = s;
+  String type = '';
+  String time = '';
+  String content = '';
+  String imgURL =
+      'https://www.polytec.com.au/img/products/960-960/white-magnetic.jpg';
+  NotificationEntity(String type, String time, String content, String imgURL) {
+    this.type = type;
+    this.time = time;
+    this.content = content;
+    this.imgURL = imgURL;
   }
   @override
   Widget build(BuildContext context) {
     return Container(
       child: GestureDetector(
-        onTap: () => {print(this.name)},
+        onTap: () => {print(this.content)},
         child: Card(
             child: Padding(
                 padding: EdgeInsets.only(top: 32, left: 16, bottom: 32),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(this.name),
+                    Text(this.content),
                     Image(
-                      image: NetworkImage(
-                          'https://pbs.twimg.com/profile_images/504715443479670784/fauyuPDy_400x400.png'),
+                      image: NetworkImage(this.imgURL),
                       height: 50,
                     )
                   ],

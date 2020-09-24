@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-final String SERVER = 'https://powerful-bastion-90835.herokuapp.com/';
+final String SERVER = 'http://35.201.162.120:5000/';
 
 class ActionPage extends StatelessWidget {
   @override
