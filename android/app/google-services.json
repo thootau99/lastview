@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "73968470461",
+    "firebase_url": "https://superb-binder-287603.firebaseio.com",
+    "project_id": "superb-binder-287603",
+    "storage_bucket": "superb-binder-287603.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73968470461:android:a9f63f7328e429e5806ad4",
+        "android_client_info": {
+          "package_name": "com.example.ntcutelloview"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "73968470461-o8flapnomf63ojp1qu03vi6ootghav11.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVehghQmoyyzX1bLC-HWqO-WBuBoVESts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "73968470461-o8flapnomf63ojp1qu03vi6ootghav11.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -112,8 +112,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton:
-          new FloatingActionButton(onPressed: null, child: new Icon(Icons.add)),
     );
   }
 }

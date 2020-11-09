@@ -3,13 +3,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:ntcutelloview/pages/action_page.dart';
 import 'package:ntcutelloview/pages/home_page.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return OverlaySupport(
+        child: MaterialApp(
       title: 'Hello Flutter',
       theme: ThemeData(
         primarySwatch: Colors.amber,
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         body: BottomNavigationController(),
       ),
       debugShowCheckedModeBanner: false,
-    );
+    ));
   }
 }
 

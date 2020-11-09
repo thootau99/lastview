@@ -92,8 +92,8 @@ def new_noti():
     timeOfNoti = request.args.get('time')
     contentOfNoti = request.args.get('content')
     imageURLOfNoti = request.args.get('imageURL')
-    NOTIFICATION_OFFICAL = {'type': typeOfNoti, 'time': timeOfNoti, 'content': contentOfNoti, 'imageURL': imageURLOfNoti}
-
+    idOfNoti = request.args.get('id')
+    NOTIFICATION_OFFICAL = {'id':idOfNoti,'type': typeOfNoti, 'time': timeOfNoti, 'content': contentOfNoti, 'imageURL': imageURLOfNoti}
     nm.notiAdd(NOTIFICATION_OFFICAL)
 
 @app.route('/show_noti')
