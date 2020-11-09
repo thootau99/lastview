@@ -14,6 +14,6 @@ def notiPrint():
 
 def notiAdd(data):
     notification_json['notification'].append(data)
-
+    print(notification_json)
     with open('./notiAc.json', 'w') as f:
         json.dump(notification_json, f)
