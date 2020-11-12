@@ -10,6 +10,12 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Need to access your photo library to select a photo add and update profile picture</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Need to access your photo library to select a photo add and update profile picture</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Need to access your photo library to select a photo add and update profile picture</string>
 	<key>CFBundleName</key>
 	<string>ntcutelloview</string>
 	<key>CFBundlePackageType</key>
@@ -41,5 +47,6 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    
 </dict>
 </plist>
