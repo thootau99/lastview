@@ -11,12 +11,15 @@ import 'dart:convert';
 import 'package:overlay_support/overlay_support.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
+import 'package:photo_view/photo_view.dart';
 
-final String SERVER = 'http://35.201.162.120:5000';
+final String SERVER = 'https://xiang.shirinmi.io';
 
 var d = ["發現不明人物", "發現人物沒有戴口罩", "發現不明人物", "發現人物沒有戴口罩"];
 CollectionReference newupload =
     FirebaseFirestore.instance.collection('newupload');
+CollectionReference notThatPerson =
+    FirebaseFirestore.instance.collection('notthatperson');
 
 class HomePage extends StatelessWidget {
   @override
@@ -203,7 +206,26 @@ class _NotificationContainer extends State<NotificationContainer> {
                     child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: noti.length,
-                  itemBuilder: (_, int index) => noti[index],
+                  // itemBuilder: (_, int index) => noti[index],
+                  itemBuilder: (context, index) {
+                    return Dismissible(
+                        key: Key(noti[index].id),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.all(2.0),
+                          title: noti[index],
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete_forever_rounded),
+                            onPressed: () {
+                              setState(() {
+                                var id = noti[index].id;
+                                final response =
+                                    http.get(SERVER + "/del_noti?id=" + id);
+                                noti.removeAt(index);
+                              });
+                            },
+                          ),
+                        ));
+                  },
                 ))),
           ),
         ],
@@ -213,10 +235,16 @@ class _NotificationContainer extends State<NotificationContainer> {
 
   addDynamic(
       String id, String type, String time, String content, String imgURL) {
+    var _content = jsonDecode(content.replaceAll("'", '"'));
+    var c = [];
+    var cp = [];
+    _content.asMap().forEach((index, item) => {
+          if (index % 2 == 0) {c.add(item)} else {cp.add(item)}
+        });
     if (noti.length == 0) {
-      noti.add(new NotificationEntity(id, type, time, content, imgURL));
+      noti.add(new NotificationEntity(id, type, time, c, cp, imgURL));
     } else {
-      noti.insert(0, new NotificationEntity(id, type, time, content, imgURL));
+      noti.insert(0, new NotificationEntity(id, type, time, c, cp, imgURL));
     }
     setState(() {});
   }
@@ -229,14 +257,15 @@ class NotificationEntity extends StatelessWidget {
   List timeList = [];
   var timeToInt = [];
   List currentTime = [];
-  String content = '';
+  List content = [];
+  List contentpath = [];
   String imgURL =
       'https://www.polytec.com.au/img/products/960-960/white-magnetic.jpg';
   String timeString = '';
   String filen = '';
   var now = new DateTime.now();
-  NotificationEntity(
-      String id, String type, String time, String content, String imgURL) {
+  NotificationEntity(String id, String type, String time, List content,
+      List contentpath, String imgURL) {
     this.type = type;
     this.time = time;
     this.id = id;
@@ -246,6 +275,7 @@ class NotificationEntity extends StatelessWidget {
     }
     this.currentTime = [now.year, now.month, now.day];
     this.content = content;
+    this.contentpath = contentpath;
     this.imgURL = imgURL;
     if (this.imgURL.split("/").length != 0) {
       var r = this.imgURL.split("/");
@@ -280,12 +310,13 @@ class NotificationEntity extends StatelessWidget {
         child: GestureDetector(
       onTap: () => {
         Navigator.push(context, MaterialPageRoute(builder: (_) {
-          return DetailScreen(url: this.imgURL);
+          return DetailScreen(
+              url: this.imgURL, n: this.content, np: this.contentpath);
         }))
       },
       child: Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+          padding: EdgeInsets.only(top: 4, left: 4, right: 0, bottom: 4),
           child: Card(
             child: Padding(
                 padding: EdgeInsets.only(top: 32, left: 16, bottom: 32),
@@ -310,7 +341,7 @@ class NotificationEntity extends StatelessWidget {
                                 ),
                               ),
                               Expanded(
-                                child: Text(this.content,
+                                child: Text(this.content.join("\n"),
                                     softWrap: true,
                                     overflow: TextOverflow.fade,
                                     style: TextStyle(
@@ -340,8 +371,14 @@ class NotificationEntity extends StatelessWidget {
 
 class DetailScreen extends StatefulWidget {
   final String url;
-  DetailScreen({Key key, @required this.url})
-      : assert(url != null),
+  final List n;
+  final List np;
+  DetailScreen({
+    Key key,
+    @required this.url,
+    @required this.n,
+    @required this.np,
+  })  : assert(url != null),
         super(key: key);
 
   @override
@@ -368,6 +405,50 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   _showCupertinoDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => new Dialog(
+              child: Column(
+                children: <Widget>[
+                  ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: widget.n.length,
+                      // itemBuilder: (_, int index) => noti[index],
+                      itemBuilder: (context, index) {
+                        return FlatButton(
+                          child: new Text(widget.n[index] + widget.np[index]),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (_) => new Dialog(
+                                      child: Column(children: <Widget>[
+                                        new TextField(
+                                          decoration: new InputDecoration(
+                                              hintText: "Update name"),
+                                          controller: _c,
+                                        ),
+                                        new FlatButton(
+                                          child: new Text("upload"),
+                                          onPressed: () {
+                                            notThatPerson.add({
+                                              "path": widget.np[index],
+                                              "name": widget.n[index],
+                                              "realname": _c.text,
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        )
+                                      ]),
+                                    ));
+                          },
+                        );
+                      })
+                ],
+              ),
+            ));
+  }
+
+  _showNotThePerson() {
     showDialog(
         context: context,
         builder: (_) => new Dialog(
@@ -404,19 +485,22 @@ class _DetailScreenState extends State<DetailScreen> {
             onPressed: () {
               _showCupertinoDialog();
             },
+          ),
+          FlatButton(
+            child: Icon(Icons.question_answer),
+            onPressed: () {
+              _showNotThePerson();
+            },
           )
         ],
       )),
       body: GestureDetector(
         child: Container(
-          child: Center(
-              child: CachedNetworkImage(
-            imageUrl: widget.url,
+          child: PhotoView(
+              imageProvider: CachedNetworkImageProvider(
+            widget.url,
           )),
         ),
-        onTap: () {
-          Navigator.pop(context);
-        },
       ),
     );
   }
