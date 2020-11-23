@@ -3,13 +3,15 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 //void main() => runApp(MyApp());
-
+bool uploading = false;
+String uploadText = "Upload Image";
 CollectionReference newupload = FirebaseFirestore.instance.collection('photo');
 final Color yellow = Colors.amber;
 final Color orange = Color(0xfffb6900);
@@ -24,6 +26,9 @@ class TestImageToSystem extends StatefulWidget {
 
 class _TestImageToSystem extends State<TestImageToSystem> {
   File _imageFile;
+  var _progress = 0.0;
+  var _uploaded = 0.0;
+  var _toupload = 0.0;
   final nameInput = TextEditingController();
 
   ///NOTE: Only supported on Android & iOS
@@ -39,16 +44,35 @@ class _TestImageToSystem extends State<TestImageToSystem> {
   }
 
   Future uploadImageToFirebase(BuildContext context) async {
+    setState(() {
+      uploading = true;
+      uploadText = "Uploading...";
+    });
     String fileName = basename(_imageFile.path);
     StorageReference firebaseStorageRef =
         FirebaseStorage.instance.ref().child('test/save/$fileName');
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
+    uploadTask.events.listen((event) {
+      setState(() {
+        _progress = event.snapshot.bytesTransferred.toDouble() /
+            event.snapshot.totalByteCount.toDouble();
+        _toupload = event.snapshot.totalByteCount.toDouble();
+        _toupload = _toupload / 1024;
+        _uploaded = event.snapshot.bytesTransferred.toDouble();
+        _uploaded = _toupload / 1024;
+      });
+    });
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+
     taskSnapshot.ref.getDownloadURL().then(
       (value) {
         print(value);
         newupload.add({"url": value});
         shownoti("upload done");
+        setState(() {
+          uploading = false;
+          uploadText = "Upload Image";
+        });
       },
     );
   }
@@ -73,6 +97,11 @@ class _TestImageToSystem extends State<TestImageToSystem> {
             margin: const EdgeInsets.only(top: 80),
             child: Column(
               children: <Widget>[
+                LinearProgressIndicator(
+                  value: _progress,
+                ),
+                Text(
+                    "${(this._progress * 100).toInt()}% finished ${uploading}"),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
@@ -131,9 +160,10 @@ class _TestImageToSystem extends State<TestImageToSystem> {
                 ),
                 borderRadius: BorderRadius.circular(30.0)),
             child: FlatButton(
-              onPressed: () => uploadImageToFirebase(context),
+              onPressed: () =>
+                  uploading ? null : uploadImageToFirebase(context),
               child: Text(
-                "Upload Image",
+                uploadText,
                 style: TextStyle(fontSize: 20),
               ),
             ),

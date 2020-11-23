@@ -9,6 +9,8 @@ import 'package:path/path.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 //void main() => runApp(MyApp());
+bool uploading = false;
+String uploadText = "Upload Image";
 
 CollectionReference newupload =
     FirebaseFirestore.instance.collection('newupload');
@@ -27,6 +29,9 @@ class UploadingImageToFirebaseStorage extends StatefulWidget {
 class _UploadingImageToFirebaseStorageState
     extends State<UploadingImageToFirebaseStorage> {
   File _imageFile;
+  var _progress = 0.0;
+  var _uploaded = 0.0;
+  var _toupload = 0.0;
   final nameInput = TextEditingController();
 
   ///NOTE: Only supported on Android & iOS
@@ -42,6 +47,11 @@ class _UploadingImageToFirebaseStorageState
   }
 
   Future uploadImageToFirebase(BuildContext context) async {
+    setState(() {
+      uploading = true;
+      uploadText = "Uploading...";
+    });
+    print(uploading);
     String personName = nameInput.text + ".jpg";
 
     String fileName = basename(_imageFile.path);
@@ -52,11 +62,26 @@ class _UploadingImageToFirebaseStorageState
         FirebaseStorage.instance.ref().child('uploads/$personName');
     print(fileName);
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
+    uploadTask.events.listen((event) {
+      setState(() {
+        _progress = event.snapshot.bytesTransferred.toDouble() /
+            event.snapshot.totalByteCount.toDouble();
+        _toupload = event.snapshot.totalByteCount.toDouble();
+        _toupload = _toupload / 1024;
+        _uploaded = event.snapshot.bytesTransferred.toDouble();
+        _uploaded = _toupload / 1024;
+      });
+    });
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL().then(
       (value) {
         value = newupload.add({"url": value, "name": personName});
         shownoti("upload done");
+        uploading = false;
+        setState(() {
+          uploading = false;
+          uploadText = "Upload Image";
+        });
       },
     );
   }
@@ -81,6 +106,11 @@ class _UploadingImageToFirebaseStorageState
             margin: const EdgeInsets.only(top: 80),
             child: Column(
               children: <Widget>[
+                LinearProgressIndicator(
+                  value: _progress,
+                ),
+                Text(
+                    "${(this._progress * 100).toInt()}% finished ${uploading}"),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
@@ -139,9 +169,10 @@ class _UploadingImageToFirebaseStorageState
                 ),
                 borderRadius: BorderRadius.circular(30.0)),
             child: FlatButton(
-              onPressed: () => uploadImageToFirebase(context),
+              onPressed: () =>
+                  uploading ? null : uploadImageToFirebase(context),
               child: Text(
-                "Upload Image",
+                uploadText,
                 style: TextStyle(fontSize: 20),
               ),
             ),
