@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,10 +15,11 @@ import 'package:ntcutelloview/pages/test_face_page.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+
 void main() {
   HttpOverrides.global = new MyHttpOverrides();
-  runApp(MyApp());
 
+  runApp(MyApp());
 }
 
 class MyHttpOverrides extends HttpOverrides {
@@ -31,7 +34,17 @@ class MyHttpOverrides extends HttpOverrides {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Firebase.initializeApp();
+    Firebase.initializeApp().then((value) {
+      initNotification();
+      CollectionReference deviceToken =
+        FirebaseFirestore.instance.collection('deviceToken');
+
+      firebaseMessaging.getToken().then((token) {
+        deviceToken.add({"token": token});
+        print(token);
+    });
+    });
+   
     return OverlaySupport(
         child: MaterialApp(
       title: 'Hello Flutter',
@@ -90,4 +103,42 @@ class _BottomNavigationController extends State<BottomNavigationController> {
       _currentIndex = index;
     });
   }
+}
+
+FirebaseMessaging firebaseMessaging;
+
+Future<void> initNotification() async {
+  firebaseMessaging = FirebaseMessaging()
+    ..requestNotificationPermissions()
+    ..onIosSettingsRegistered.listen((IosNotificationSettings settings) {})
+    ..configure(
+      onMessage: (Map<String, dynamic> message) async {
+        shownoti(message["notification"]["body"]);
+      },
+      onBackgroundMessage:
+          Platform.isAndroid ? myBackgroundMessageHandler : null,
+      onLaunch: (Map<String, dynamic> message) async {
+        print('onLaunch: $message');
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print('onResume: $message');
+      },
+    );
+}
+
+Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
+  if (message.containsKey('data')) {
+    // データメッセージをハンドリング
+    final dynamic data = message['data'];
+  }
+
+  if (message.containsKey('notification')) {
+    // 通知メッセージをハンドリング
+    final dynamic notification = message['notification'];
+  }
+  print('onBackground: $message');
+}
+
+void shownoti(s) {
+  showSimpleNotification(Text(s), background: Colors.amber);
 }
