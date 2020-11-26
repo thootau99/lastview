@@ -1,4 +1,7 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -25,6 +28,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String minutes = "";
   _fetchData() async {
     setState(() {});
     String result = '';
@@ -55,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Container(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new Flexible(
               child: new ListView.builder(
@@ -69,7 +74,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   var url = SERVER + "new_data?ins=takeoff";
                   http.get(url);
                 },
-                child: Text("TAKEOFF"),
+                child: Text(
+                  "TAKEOFF",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ),
             FlatButton(
@@ -77,35 +85,44 @@ class _MyHomePageState extends State<MyHomePage> {
                 var url = SERVER + "new_data?ins=land";
                 http.get(url);
               },
-              child: Text("LAND"),
+              child: Text("LAND", style: TextStyle(fontSize: 20)),
             ),
             FlatButton(
               onPressed: () {
                 var url = SERVER + "stopwork";
                 http.get(url);
               },
-              child: Text("STOP"),
+              child: Text("STOP", style: TextStyle(fontSize: 20)),
             ),
             FlatButton(
               onPressed: () {
                 var url = SERVER + "startwork";
                 http.get(url);
               },
-              child: Text("START"),
+              child: Text("START", style: TextStyle(fontSize: 20)),
             ),
             FlatButton(
-              onPressed: () {
-                String setname = SERVER + "mask";
+              onPressed: () async {
+                final text = await showTextInputDialog(
+                  context: context,
+                  textFields: const [
+                    DialogTextField(),
+                  ],
+                  title: 'Enter time in mintue',
+                  message: 'The drone will fly after the time',
+                );
+
+                String setname = SERVER + "timer?time=" + text[0];
                 http.get(setname);
               },
-              child: Text("MASK"),
+              child: Text("TIMER", style: TextStyle(fontSize: 20)),
             ),
             FlatButton(
               onPressed: () {
                 String setname = SERVER + "normal";
                 http.get(setname);
               },
-              child: Text("NORMAL"),
+              child: Text("NORMAL", style: TextStyle(fontSize: 20)),
             ),
             FlatButton(
               onPressed: _fetchData,
