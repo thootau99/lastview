@@ -1,6 +1,7 @@
 //Caution: Only works on Android & iOS platforms
 import 'dart:io';
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,14 @@ class _UploadingImageToFirebaseStorageState
   }
 
   Future uploadImageToFirebase(BuildContext context) async {
+    final text = await showTextInputDialog(
+      context: context,
+      textFields: const [
+        DialogTextField(),
+      ],
+      title: 'Enter name',
+      message: 'the system will save the name in database',
+    );
     setState(() {
       uploading = true;
       uploadText = "Uploading...";
@@ -75,7 +84,7 @@ class _UploadingImageToFirebaseStorageState
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL().then(
       (value) {
-        value = newupload.add({"url": value, "name": personName});
+        value = newupload.add({"url": value, "name": text[0]});
         shownoti("upload done");
         uploading = false;
         setState(() {
@@ -111,16 +120,16 @@ class _UploadingImageToFirebaseStorageState
                 ),
                 Text(
                     "${(this._progress * 100).toInt()}% finished ${uploading}"),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                      child: TextField(
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Enter the name of the person'),
-                    controller: nameInput,
-                  )),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Center(
+                //       child: TextField(
+                //     decoration: InputDecoration(
+                //         border: InputBorder.none,
+                //         hintText: 'Enter the name of the person'),
+                //     controller: nameInput,
+                //   )),
+                // ),
                 SizedBox(height: 20.0),
                 Expanded(
                   child: Stack(
@@ -170,7 +179,7 @@ class _UploadingImageToFirebaseStorageState
                 borderRadius: BorderRadius.circular(30.0)),
             child: FlatButton(
               onPressed: () =>
-                  uploading ? null : uploadImageToFirebase(context),
+                  _imageFile == null ? null : uploadImageToFirebase(context),
               child: Text(
                 uploadText,
                 style: TextStyle(fontSize: 20),

@@ -87,20 +87,20 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: Text("LAND", style: TextStyle(fontSize: 20)),
             ),
-            FlatButton(
-              onPressed: () {
-                var url = SERVER + "stopwork";
-                http.get(url);
-              },
-              child: Text("STOP", style: TextStyle(fontSize: 20)),
-            ),
-            FlatButton(
-              onPressed: () {
-                var url = SERVER + "startwork";
-                http.get(url);
-              },
-              child: Text("START", style: TextStyle(fontSize: 20)),
-            ),
+            // FlatButton(
+            //   onPressed: () {
+            //     var url = SERVER + "stopwork";
+            //     http.get(url);
+            //   },
+            //   child: Text("STOP", style: TextStyle(fontSize: 20)),
+            // ),
+            // FlatButton(
+            //   onPressed: () {
+            //     var url = SERVER + "startwork";
+            //     http.get(url);
+            //   },
+            //   child: Text("START", style: TextStyle(fontSize: 20)),
+            // ),
             FlatButton(
               onPressed: () async {
                 final text = await showTextInputDialog(
@@ -117,17 +117,17 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: Text("TIMER", style: TextStyle(fontSize: 20)),
             ),
-            FlatButton(
-              onPressed: () {
-                String setname = SERVER + "normal";
-                http.get(setname);
-              },
-              child: Text("NORMAL", style: TextStyle(fontSize: 20)),
-            ),
-            FlatButton(
-              onPressed: _fetchData,
-              child: new Icon(Icons.add),
-            ),
+            // FlatButton(
+            //   onPressed: () {
+            //     String setname = SERVER + "normal";
+            //     http.get(setname);
+            //   },
+            //   child: Text("NORMAL", style: TextStyle(fontSize: 20)),
+            // ),
+            // FlatButton(
+            //   onPressed: _fetchData,
+            //   child: new Icon(Icons.add),
+            // ),
           ],
         ),
       ),

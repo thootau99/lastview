@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupertino_stackview/cupertino_stackview.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:convert';
 import 'package:overlay_support/overlay_support.dart';
 import 'dart:ui' as ui;
@@ -405,10 +407,13 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   _showCupertinoDialog() {
-    showDialog(
+    showCupertinoModalBottomSheet(
+        expand: false,
         context: context,
-        builder: (_) => new Dialog(
+        builder: (context) => new SafeArea(
+              top: false,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   ListView.builder(
                       shrinkWrap: true,
@@ -417,29 +422,38 @@ class _DetailScreenState extends State<DetailScreen> {
                       itemBuilder: (context, index) {
                         return FlatButton(
                           child: new Text(widget.n[index] + widget.np[index]),
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (_) => new Dialog(
-                                      child: Column(children: <Widget>[
-                                        new TextField(
-                                          decoration: new InputDecoration(
-                                              hintText: "Update name"),
-                                          controller: _c,
-                                        ),
-                                        new FlatButton(
-                                          child: new Text("upload"),
-                                          onPressed: () {
-                                            notThatPerson.add({
-                                              "path": widget.np[index],
-                                              "name": widget.n[index],
-                                              "realname": _c.text,
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                        )
-                                      ]),
-                                    ));
+                          onPressed: () async {
+                            final text = await showTextInputDialog(
+                              context: context,
+                              textFields: const [
+                                DialogTextField(),
+                              ],
+                              title: 'Enter name',
+                              message: 'the system will save the name in database',
+                            );
+                            notThatPerson.add({
+                              "path": widget.np[index],
+                              "name": widget.n[index],
+                              "realname": text[0],
+                            });
+                            Navigator.pop(context);
+                            // showCupertinoModalBottomSheet(
+                            //     context: context,
+                            //     builder: (_) => new Dialog(
+                            //           child: Column(children: <Widget>[
+                            //             new TextField(
+                            //               decoration: new InputDecoration(
+                            //                   hintText: "Update name"),
+                            //               controller: _c,
+                            //             ),
+                            //             new FlatButton(
+                            //               child: new Text("upload"),
+                            //               onPressed: () {
+
+                            //               },
+                            //             )
+                            //           ]),
+                            //         ));
                           },
                         );
                       })
@@ -486,12 +500,6 @@ class _DetailScreenState extends State<DetailScreen> {
               _showCupertinoDialog();
             },
           ),
-          FlatButton(
-            child: Icon(Icons.question_answer),
-            onPressed: () {
-              _showNotThePerson();
-            },
-          )
         ],
       )),
       body: GestureDetector(

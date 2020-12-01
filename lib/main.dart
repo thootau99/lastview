@@ -15,10 +15,9 @@ import 'package:ntcutelloview/pages/test_face_page.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-
+GlobalKey<NavigatorState> navigatorState = GlobalKey<NavigatorState>();
 void main() {
   HttpOverrides.global = new MyHttpOverrides();
-
   runApp(MyApp());
 }
 
@@ -72,7 +71,6 @@ class _BottomNavigationController extends State<BottomNavigationController> {
     ActionPage(),
     UploadingImageToFirebaseStorage(),
     TestImageToSystem(),
-    MainPage()
   ];
 
   @override
@@ -88,8 +86,6 @@ class _BottomNavigationController extends State<BottomNavigationController> {
               icon: Icon(Icons.upload_file), title: Text('上傳新人')),
           BottomNavigationBarItem(
               icon: Icon(Icons.upload_outlined), title: Text('測試')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.upload_outlined), title: Text('測試2')),
         ],
         currentIndex: _currentIndex, //目前選擇頁索引值
         fixedColor: Colors.amber, //選擇頁顏色
